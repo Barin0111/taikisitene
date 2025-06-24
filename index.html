@@ -5,15 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BARIN Interface 会話表示</title>
   <style>
+    /* リセットと基本 */
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       background-color: #0a0a0a;
       color: #e0e0e0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    /* タイトルバー */
+    header {
+      background: linear-gradient(90deg, #00ffff, #006666);
+      padding: 12px 24px;
+      color: #001f1f;
+      font-weight: bold;
+      font-size: 1.3rem;
+      letter-spacing: 1.5px;
+      box-shadow: 0 2px 8px rgba(0,255,255,0.4);
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    /* タスクバー */
+    footer {
+      background: linear-gradient(90deg, #003333, #004444);
+      padding: 8px 24px;
+      color: #66ffff;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: inset 0 1px 3px rgba(255,255,255,0.2);
+      flex-shrink: 0;
+      user-select: none;
+    }
+    footer .task-info {
+      font-style: italic;
+    }
+    footer .time {
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    /* メインコンテンツ（チャットボックス） */
+    main {
+      flex-grow: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      padding: 20px;
+      overflow: hidden;
     }
     .chat-box {
       width: 90%;
@@ -21,7 +67,7 @@
       background-color: #1a1a1a;
       border-radius: 12px;
       padding: 24px;
-      box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
       overflow-y: auto;
       max-height: 80vh;
     }
@@ -48,7 +94,16 @@
   </style>
 </head>
 <body>
-  <div class="chat-box" id="chat-box"></div>
+  <header>
+    BARIN Interface - 会話ログ
+  </header>
+  <main>
+    <div class="chat-box" id="chat-box"></div>
+  </main>
+  <footer>
+    <div class="task-info">タスクバー：システム稼働中</div>
+    <div class="time" id="current-time"></div>
+  </footer>
 
   <script>
     const messages = [
@@ -61,7 +116,6 @@
 
     const chatBox = document.getElementById('chat-box');
 
-    // タイプライターで一文字ずつ表示
     function typeMessage(msgObj, callback) {
       const div = document.createElement('div');
       div.classList.add('message');
@@ -74,7 +128,7 @@
           div.textContent += msgObj.text.charAt(index);
           index++;
           setTimeout(type, 40);
-          chatBox.scrollTop = chatBox.scrollHeight; // 自動スクロール
+          chatBox.scrollTop = chatBox.scrollHeight;
         } else {
           callback();
         }
@@ -82,14 +136,24 @@
       type();
     }
 
-    // 配列のメッセージを順番にタイプ表示
     function playConversation(i = 0) {
       if(i < messages.length) {
         typeMessage(messages[i], () => playConversation(i + 1));
       }
     }
 
+    // タスクバーの時刻更新
+    function updateTime() {
+      const now = new Date();
+      const h = now.getHours().toString().padStart(2,'0');
+      const m = now.getMinutes().toString().padStart(2,'0');
+      const s = now.getSeconds().toString().padStart(2,'0');
+      document.getElementById('current-time').textContent = `${h}:${m}:${s}`;
+    }
+
     window.onload = () => {
+      updateTime();
+      setInterval(updateTime, 1000);
       playConversation();
     };
   </script>
