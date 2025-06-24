@@ -26,30 +26,19 @@
       border-bottom: 1px solid #e0e0e0;
     }
 
-    footer {
-      background-color: #ffffff;
-      padding: 8px 24px;
-      font-size: 0.9rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid #e0e0e0;
-    }
-
     main {
       flex: 1;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       padding: 20px;
+      overflow-y: auto;
     }
 
     .chat-box {
       width: 100%;
       max-width: 900px;
       padding: 0 20px;
-      overflow-y: auto;
-      max-height: 80vh;
     }
 
     .message {
@@ -72,6 +61,49 @@
       text-align: right;
     }
 
+    .input-area {
+      background: #ffffff;
+      padding: 12px 24px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    #chat-form {
+      display: flex;
+      gap: 8px;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button[type="submit"] {
+      padding: 8px 16px;
+      font-size: 1rem;
+      background: #3399cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+      background: #287ca4;
+    }
+
+    footer {
+      background-color: #ffffff;
+      padding: 8px 24px;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #e0e0e0;
+    }
+
     .time {
       font-family: monospace;
       color: #666;
@@ -79,13 +111,19 @@
   </style>
 </head>
 <body>
-  <header>
-    BARIN Interface
-  </header>
+  <header>BARIN Interface</header>
 
   <main>
     <div class="chat-box" id="chat-box"></div>
   </main>
+
+  <!-- 入力欄 -->
+  <section class="input-area">
+    <form id="chat-form">
+      <input type="text" id="user-input" placeholder="メッセージを入力..." autocomplete="off" />
+      <button type="submit">送信</button>
+    </form>
+  </section>
 
   <footer>
     <div class="task-info">会話ログ表示中</div>
@@ -141,6 +179,18 @@
       setInterval(updateTime, 1000);
       playConversation();
     };
+
+    // 入力フォームからメッセージを送信
+    document.getElementById('chat-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const input = document.getElementById('user-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      // 表示 → メッセージの配列に入れず即表示
+      typeMessage({ speaker: "User", text }, () => {});
+      input.value = '';
+    });
   </script>
 </body>
 </html>
