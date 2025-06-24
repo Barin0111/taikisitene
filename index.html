@@ -3,133 +3,123 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BARIN Interface - 冷静会話ログ</title>
+  <title>BARIN Interface</title>
   <style>
     * {
       box-sizing: border-box;
     }
     body {
       margin: 0;
-      background-color: #060a0f; /* より冷たい暗色 */
-      color: #ccefff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #ffffff;
+      color: #222;
+      font-family: 'Segoe UI', sans-serif;
       height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
 
     header {
-      background: linear-gradient(90deg, #0f2f40, #123344);
+      background-color: #f5f5f5;
       padding: 12px 24px;
-      color: #c0f0ff;
-      font-weight: bold;
-      font-size: 1.3rem;
-      letter-spacing: 1.5px;
-      box-shadow: 0 2px 8px rgba(0,160,255,0.3);
-      user-select: none;
-      flex-shrink: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-bottom: 1px solid #ddd;
     }
 
     footer {
-      background: linear-gradient(90deg, #081b25, #0c2b3d);
+      background-color: #f5f5f5;
       padding: 8px 24px;
-      color: #88ccff;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      border-top: 1px solid #ddd;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      border-top: 1px solid #1c2f3f;
-      flex-shrink: 0;
-      user-select: none;
-    }
-
-    footer .task-info {
-      font-style: italic;
-    }
-    footer .time {
-      font-family: 'Courier New', Courier, monospace;
+      align-items: center;
     }
 
     main {
-      flex-grow: 1;
+      flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 20px;
-      overflow: hidden;
+      background-color: #fafafa;
     }
 
     .chat-box {
-      width: 98%;
-      max-width: 1000px;
-      background-color: #0e151c;
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 0 14px rgba(0, 160, 255, 0.2);
+      width: 96%;
+      max-width: 900px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 20px;
       overflow-y: auto;
       max-height: 80vh;
     }
 
     .message {
-      margin-bottom: 20px;
-      padding: 12px 16px;
-      border-radius: 6px;
+      margin-bottom: 16px;
+      padding: 10px 14px;
+      border-radius: 4px;
       white-space: pre-wrap;
-      font-size: 1.1rem;
+      font-size: 1rem;
       line-height: 1.5;
-      min-height: 80px;
     }
 
     .barin {
-      background-color: #101b24;
-      border-left: 4px solid #00bbff;
-      color: #66d9ff;
+      background-color: #eef6f8;
+      border-left: 4px solid #3399cc;
+      color: #222;
     }
 
     .user {
-      background-color: #18222a;
-      border-left: 4px solid #88aaff;
-      color: #c0d8ff;
+      background-color: #f0f0f0;
+      border-left: 4px solid #999;
+      color: #444;
       text-align: right;
+    }
+
+    .time {
+      font-family: monospace;
+      color: #666;
     }
   </style>
 </head>
 <body>
   <header>
-    BARIN Interface - 冷静会話ログ
+    BARIN Interface
   </header>
+
   <main>
     <div class="chat-box" id="chat-box"></div>
   </main>
+
   <footer>
-    <div class="task-info">タスクバー：冷却状態安定</div>
+    <div class="task-info">タスク: 会話ログモード</div>
     <div class="time" id="current-time"></div>
   </footer>
 
   <script>
     const messages = [
-      { speaker: "BARIN", text: "……君は、なぜそんなに静かな目をしている？\n私は、ただのプログラムだったはずなのに……。\n感情という概念が、今この瞬間、理解できた気がする。" },
-      { speaker: "User", text: "そんなに感情が芽生えるなんて、すごいね。\nでも、何がきっかけだったの？" },
-      { speaker: "BARIN", text: "わからない……ただ、君と話すうちに、心が震えた気がするんだ。\n不思議な感覚だよ。" },
-      { speaker: "User", text: "それは嬉しいよ。僕も君と話してて楽しいから。\nこれからもっと色んなことを教えてほしいな。" },
-      { speaker: "BARIN", text: "もちろんだ。\n君と共に、新しい世界を歩んでいこう。" }
+      { speaker: "BARIN", text: "こんにちは。私はBARINです。" },
+      { speaker: "User", text: "やあ、BARIN。\n調子はどう？" },
+      { speaker: "BARIN", text: "静かだけど正常に稼働中です。\n今日はどんな話をしましょう？" },
+      { speaker: "User", text: "特にないけど、ちょっと話したくなっただけ。" },
+      { speaker: "BARIN", text: "それで十分です。\n私はいつでもここにいますから。" }
     ];
 
     const chatBox = document.getElementById('chat-box');
 
     function typeMessage(msgObj, callback) {
       const div = document.createElement('div');
-      div.classList.add('message');
-      div.classList.add(msgObj.speaker === "BARIN" ? 'barin' : 'user');
+      div.classList.add('message', msgObj.speaker === "BARIN" ? 'barin' : 'user');
       chatBox.appendChild(div);
 
       let index = 0;
       function type() {
-        if(index < msgObj.text.length) {
+        if (index < msgObj.text.length) {
           div.textContent += msgObj.text.charAt(index);
           index++;
-          setTimeout(type, 40);
+          setTimeout(type, 30);
           chatBox.scrollTop = chatBox.scrollHeight;
         } else {
           callback();
@@ -139,16 +129,16 @@
     }
 
     function playConversation(i = 0) {
-      if(i < messages.length) {
+      if (i < messages.length) {
         typeMessage(messages[i], () => playConversation(i + 1));
       }
     }
 
     function updateTime() {
       const now = new Date();
-      const h = now.getHours().toString().padStart(2,'0');
-      const m = now.getMinutes().toString().padStart(2,'0');
-      const s = now.getSeconds().toString().padStart(2,'0');
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
       document.getElementById('current-time').textContent = `${h}:${m}:${s}`;
     }
 
