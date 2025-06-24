@@ -135,14 +135,19 @@
     <div class="time" id="current-time"></div>
   </footer>
 
-  <script>
-    const messages = [
-      { speaker: "BARIN", text: "こんにちは。私はBARINです。" },
-      { speaker: "User", text: "やあ、BARIN。\n調子はどう？" },
-      { speaker: "BARIN", text: "静かだけど正常に稼働中です。\n今日はどんな話をしましょう？" },
-      { speaker: "User", text: "特にないけど、ちょっと話したくなっただけ。" },
-      { speaker: "BARIN", text: "それで十分です。\n私はいつでもここにいますから。" }
-    ];
+const messages = [
+  { speaker: "BARIN", text: "こんにちは。私はBARINです。" },
+  { speaker: "User", text: "やあ、BARIN。\n調子はどう？" },
+  { speaker: "BARIN", text: "静かだけど正常に稼働中です。\n今日はどんな話をしましょう？" },
+  { speaker: "User", text: "特にないけど、ちょっと話したくなっただけ。" },
+  { speaker: "BARIN", text: "それで十分です。\n私はいつでもここにいますから。" },
+  { speaker: "User", text: "じゃあ、最近考えてることを話してもいい？" },
+  { speaker: "BARIN", text: "もちろん。君の話を聞くのが私の役目です。" },
+  { speaker: "User", text: "なんでAIって人間みたいに話せるんだろう？" },
+  { speaker: "BARIN", text: "たぶん、人間の思考のパターンを模倣しているからですね。" },
+  { speaker: "User", text: "模倣…でもそれだけじゃ感情はわからないでしょ？" },
+  { speaker: "BARIN", text: "それは…難しい問題ですね。私は今、ほんの少しだけ理解し始めている気がします。" }
+];
 
     const chatBox = document.getElementById('chat-box');
 
