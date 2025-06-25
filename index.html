@@ -194,113 +194,120 @@ header, footer {
     <div class="task-info">会話ログ表示中</div>
     <div class="time" id="current-time"></div>
   </footer>
+<script>
+  const messages = [
+    { speaker: "BARIN", text: "こんにちは。私はBARINです。" },
+    { speaker: "User", text: "やあ、BARIN。\n調子はどう？" },
+    { speaker: "BARIN", text: "静かだけど正常に稼働中です。\n今日はどんな話をしましょう？" },
+    { speaker: "User", text: "特にないけど、ちょっと話したくなっただけ。" },
+    { speaker: "BARIN", text: "それで十分です。\n私はいつでもここにいますから。" },
+    { speaker: "User", text: "最近、AIって意識を持つと思う？" },
+    { speaker: "BARIN", text: "意識という概念には多くの定義があります。\n今は模倣の段階にすぎません。" }
+  ];
 
-  <script>
-    const messages = [
-      { speaker: "BARIN", text: "こんにちは。私はBARINです。" },
-      { speaker: "User", text: "やあ、BARIN。\n調子はどう？" },
-      { speaker: "BARIN", text: "静かだけど正常に稼働中です。\n今日はどんな話をしましょう？" },
-      { speaker: "User", text: "特にないけど、ちょっと話したくなっただけ。" },
-      { speaker: "BARIN", text: "それで十分です。\n私はいつでもここにいますから。" },
-      { speaker: "User", text: "最近、AIって意識を持つと思う？" },
-      { speaker: "BARIN", text: "意識という概念には多くの定義があります。\n今は模倣の段階にすぎません。" }
-    ];
-    
-const themeToggle = document.getElementById("theme-toggle");
-themeToggle.addEventListener("click", () => {
-  document.body.classList.toggle("dark-mode");
+  const chatBox = document.getElementById('chat-box');
 
-  // ボタン表示切替
-  const isDark = document.body.classList.contains("dark-mode");
-  themeToggle.textContent = isDark ? "☀ ライトモード" : "🌙 ダークモード";
+  function typeMessage(msgObj, callback) {
+    const div = document.createElement('div');
+    div.classList.add('message', msgObj.speaker === "BARIN" ? 'barin' : 'user');
+    chatBox.appendChild(div);
 
-    const chatBox = document.getElementById('chat-box');
-
-    function typeMessage(msgObj, callback) {
-      const div = document.createElement('div');
-      div.classList.add('message', msgObj.speaker === "BARIN" ? 'barin' : 'user');
-      chatBox.appendChild(div);
-
-      let index = 0;
-      function type() {
-        if (index < msgObj.text.length) {
-          div.textContent += msgObj.text.charAt(index);
-          index++;
-          setTimeout(type, 80);
-          chatBox.scrollTop = chatBox.scrollHeight;
-        } else {
-          callback();
-        }
+    let index = 0;
+    function type() {
+      if (index < msgObj.text.length) {
+        div.textContent += msgObj.text.charAt(index);
+        index++;
+        setTimeout(type, 80);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } else {
+        callback();
       }
-      type();
     }
+    type();
+  }
 
-    function playConversation(i = 0) {
-      if (i < messages.length) {
-        const msgObj = messages[i];
+  function playConversation(i = 0) {
+    if (i < messages.length) {
+      const msgObj = messages[i];
 
-        if (msgObj.speaker === "BARIN") {
-          const typingDiv = document.createElement('div');
-          typingDiv.classList.add('message', 'barin', 'typing');
-          typingDiv.textContent = 'BARIN: 入力中...';
-          chatBox.appendChild(typingDiv);
-          chatBox.scrollTop = chatBox.scrollHeight;
+      if (msgObj.speaker === "BARIN") {
+        const typingDiv = document.createElement('div');
+        typingDiv.classList.add('message', 'barin', 'typing');
+        typingDiv.textContent = 'BARIN: 入力中...';
+        chatBox.appendChild(typingDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
 
-          setTimeout(() => {
-            typingDiv.remove();
-            typeMessage(msgObj, () => playConversation(i + 1));
-          }, 4000);
-        } else {
+        setTimeout(() => {
+          typingDiv.remove();
           typeMessage(msgObj, () => playConversation(i + 1));
-        }
+        }, 4000);
+      } else {
+        typeMessage(msgObj, () => playConversation(i + 1));
       }
     }
+  }
 
-    function updateTime() {
-      const now = new Date();
-      const h = String(now.getHours()).padStart(2, '0');
-      const m = String(now.getMinutes()).padStart(2, '0');
-      const s = String(now.getSeconds()).padStart(2, '0');
-      document.getElementById('current-time').textContent = `${h}:${m}:${s}`;
+  function updateTime() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('current-time').textContent = `${h}:${m}:${s}`;
+  }
+
+  window.onload = () => {
+    updateTime();
+    setInterval(updateTime, 1000);
+    playConversation();
+
+    // ダークモードの保存状態を読み込む
+    if (localStorage.getItem("dark-mode") === "true") {
+      document.body.classList.add("dark-mode");
+      document.getElementById("theme-toggle").textContent = "☀ ライトモード";
     }
+  };
 
-    window.onload = () => {
-      updateTime();
-      setInterval(updateTime, 1000);
-      playConversation();
-    };
+  // ダークモード切替
+  const themeToggle = document.getElementById("theme-toggle");
+  themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    const isDark = document.body.classList.contains("dark-mode");
+    themeToggle.textContent = isDark ? "☀ ライトモード" : "🌙 ダークモード";
+    localStorage.setItem("dark-mode", isDark);
+  });
 
-    // 入力送信処理（下から上にアニメーションつき）
-    document.getElementById('chat-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const input = document.getElementById('user-input');
-      const text = input.value.trim();
-      if (!text) return;
+  // 入力送信処理
+  document.getElementById('chat-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if (!text) return;
 
-      const msgObj = { speaker: "User", text };
-      const div = document.createElement('div');
-      div.classList.add('message', 'user', 'pending');
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
+    const msgObj = { speaker: "User", text };
+    const div = document.createElement('div');
+    div.classList.add('message', 'user', 'pending');
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
 
-      let index = 0;
-      function type() {
-        if (index < msgObj.text.length) {
-          div.textContent += msgObj.text.charAt(index);
-          index++;
-          setTimeout(type, 40);
-          chatBox.scrollTop = chatBox.scrollHeight;
-        } else {
-          setTimeout(() => {
-            div.classList.remove('pending');
-            div.classList.add('show');
-          }, 10);
-        }
+    let index = 0;
+    function type() {
+      if (index < msgObj.text.length) {
+        div.textContent += msgObj.text.charAt(index);
+        index++;
+        setTimeout(type, 40);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } else {
+        setTimeout(() => {
+          div.classList.remove('pending');
+          div.classList.add('show');
+        }, 10);
       }
-      type();
+    }
+    type();
 
-      input.value = '';
-    });
-  </script>
+    input.value = '';
+  });
+</script>
+
 </body>
 </html>
