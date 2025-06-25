@@ -99,12 +99,6 @@
     .message-container.user {
       flex-direction: row-reverse;
     }
-    .message-container img.avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
     .message-bubble {
       padding: 10px 14px;
       border-radius: 16px;
@@ -239,14 +233,9 @@
       const container = document.createElement('div');
       container.classList.add('message-container', msgObj.speaker === "BARIN" ? 'barin' : 'user');
 
-      const avatar = document.createElement('img');
-      avatar.classList.add('avatar');
-      avatar.src = msgObj.speaker === "BARIN" ? 'https://via.placeholder.com/40/00cccc/ffffff?text=B' : 'https://via.placeholder.com/40/cccccc/000000?text=U';
-
       const bubble = document.createElement('div');
       bubble.classList.add('message-bubble');
 
-      container.appendChild(avatar);
       container.appendChild(bubble);
       chatBox.appendChild(container);
 
@@ -272,7 +261,6 @@
           const typingDiv = document.createElement('div');
           typingDiv.classList.add('message-container', 'barin');
           typingDiv.innerHTML = `
-            <img class="avatar" src="https://via.placeholder.com/40/00cccc/ffffff?text=B">
             <div class="message-bubble">BARIN: 入力中...</div>
           `;
           chatBox.appendChild(typingDiv);
