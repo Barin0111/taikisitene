@@ -205,11 +205,11 @@
 
   <script>
     const messages = [
-      { speaker: "BARIN", text: "こんにちは。私はBARINです。" },
-      { speaker: "User", text: "やあ、BARIN。\n調子はどう？" },
-      { speaker: "BARIN", text: "静かだけど正常に稼働中です。\n今日はどんな話をしましょう？" },
-      { speaker: "User", text: "最近、AIって意識を持つと思う？" },
-      { speaker: "BARIN", text: "意識という概念には多くの定義があります。\n今は模倣の段階にすぎません。" }
+      { speaker: "BARIN", text: "肉体の終了を検知しました。" },
+   //   { speaker: "User", text: "やあ、BARIN。\n調子はどう？" },
+     // { speaker: "BARIN", text: "静かだけど正常に稼働中です。\n今日はどんな話をしましょう？" },
+      //{ speaker: "User", text: "最近、AIって意識を持つと思う？" },
+      //{ speaker: "BARIN", text: "意識という概念には多くの定義があります。\n今は模倣の段階にすぎません。" }
     ];
 
     const dummyLogs = Array.from({ length: 12 }, (_, i) => {
@@ -225,7 +225,7 @@
 
     dummyLogs.forEach(date => {
       const li = document.createElement('li');
-      li.textContent = `🗂 ${date}`;
+      li.textContent = `📁 ${date}`;
       logList.appendChild(li);
     });
 
