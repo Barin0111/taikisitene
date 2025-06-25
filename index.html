@@ -205,29 +205,15 @@
 
   <script>
     const messages = [
-      { speaker: "BARIN", text: "" },
-    { speaker: "User", text: "おはよ、昨日のレポート、提出されてる？" },
-    { speaker: "BARIN", text: "おはようございます、翔太さん。レポート『情報社会と倫理』は、23時58分に提出済みです。提出確認メールも届いています。" },
-    { speaker: "User", text: "ギリギリだったな……まじ助かった。ありがと。" },
-    { speaker: "BARIN", text: "あなたの成果を最大限に補助するのが、私の役目です。" }
+      { speaker: "BARIN", text: "こんにちは。私はBARINです。" },
+      { speaker: "User", text: "やあ、BARIN。\n調子はどう？" },
+      { speaker: "BARIN", text: "静かだけど正常に稼働中です。\n今日はどんな話をしましょう？" },
+      { speaker: "User", text: "最近、AIって意識を持つと思う？" },
+      { speaker: "BARIN", text: "意識という概念には多くの定義があります。\n今は模倣の段階にすぎません。" }
     ];
 
-    const dummyLogs = Array.from({ length: 12 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      return date.toLocaleDateString('ja-JP', {
-        month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
-      });
-    });
-
     const chatBox = document.getElementById('chat-box');
-    const logList = document.getElementById('log-list');
-
-    dummyLogs.forEach(date => {
-      const li = document.createElement('li');
-      li.textContent = `📁 ${date}`;
-      logList.appendChild(li);
-    });
+    const input = document.getElementById('user-input');
 
     function typeMessage(msgObj, callback) {
       const container = document.createElement('div');
@@ -253,47 +239,53 @@
       type();
     }
 
+    function simulateInput(text, callback) {
+      input.value = '';
+      let index = 0;
+      function typeChar() {
+        if (index < text.length) {
+          input.value += text.charAt(index);
+          index++;
+          setTimeout(typeChar, 80);
+        } else {
+          callback();
+        }
+      }
+      typeChar();
+    }
+
     function playConversation(i = 0) {
       if (i < messages.length) {
         const msgObj = messages[i];
+        const delay = 1200;
 
-        if (msgObj.speaker === "BARIN") {
-          const typingDiv = document.createElement('div');
-          typingDiv.classList.add('message-container', 'barin');
-          typingDiv.innerHTML = `
-            <div class="message-bubble">BARIN: 入力中...</div>
-          `;
-          chatBox.appendChild(typingDiv);
-          chatBox.scrollTop = chatBox.scrollHeight;
+        const typingDiv = document.createElement('div');
+        typingDiv.classList.add('message-container', msgObj.speaker === "BARIN" ? 'barin' : 'user');
+        typingDiv.innerHTML = `<div class="message-bubble">${msgObj.speaker}: 入力中...</div>`;
+        chatBox.appendChild(typingDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
 
-          setTimeout(() => {
-            typingDiv.remove();
+        setTimeout(() => {
+          typingDiv.remove();
+          if (msgObj.speaker === "User") {
+            simulateInput(msgObj.text, () => {
+              input.value = '';
+              typeMessage(msgObj, () => playConversation(i + 1));
+            });
+          } else {
             typeMessage(msgObj, () => playConversation(i + 1));
-          }, 3000);
-        } else {
-          typeMessage(msgObj, () => playConversation(i + 1));
-        }
+          }
+        }, delay);
       }
     }
 
-    function updateTime() {
-      const now = new Date();
-      const h = String(now.getHours()).padStart(2, '0');
-      const m = String(now.getMinutes()).padStart(2, '0');
-      const s = String(now.getSeconds()).padStart(2, '0');
-      document.getElementById('current-time').textContent = `${h}:${m}:${s}`;
-    }
-
-    window.onload = () => {
-      updateTime();
-      setInterval(updateTime, 1000);
-      playConversation();
-
-      if (localStorage.getItem("dark-mode") === "true") {
-        document.body.classList.add("dark-mode");
-        document.getElementById("theme-toggle").textContent = "☀ ライトモード";
-      }
-    };
+    document.getElementById('chat-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      typeMessage({ speaker: "User", text }, () => {});
+      input.value = '';
+    });
 
     document.getElementById("theme-toggle").addEventListener("click", () => {
       document.body.classList.toggle("dark-mode");
@@ -308,15 +300,26 @@
       document.getElementById("toggle-sidebar").textContent = sidebar.classList.contains("collapsed") ? "▶" : "◀";
     });
 
-    document.getElementById('chat-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const input = document.getElementById('user-input');
-      const text = input.value.trim();
-      if (!text) return;
+    function updateTime() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('current-time').textContent = `${h}:${m}:${s}`;
+    }
 
-      const msgObj = { speaker: "User", text };
-      typeMessage(msgObj, () => {});
-      input.value = '';
+    setInterval(updateTime, 1000);
+    updateTime();
+    playConversation();
+
+    const logList = document.getElementById('log-list');
+    Array.from({ length: 12 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const label = date.toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+      const li = document.createElement('li');
+      li.textContent = label;
+      logList.appendChild(li);
     });
   </script>
 </body>
