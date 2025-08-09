@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>モノクロ通知モック</title>
+<title>風景背景のスマホ通知モック</title>
 <style>
   * {
     box-sizing: border-box;
@@ -11,35 +11,45 @@
   html, body {
     margin: 0; padding: 0;
     height: 100%;
-    background: #111;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #eee;
+    overflow: hidden;
+  }
+  body {
+    /* フリーの風景画像を背景に */
+    background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1280&q=80') no-repeat center center fixed;
+    background-size: cover;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: #ddd;
-    overflow: hidden;
+  }
+  /* 背景ぼかし用オーバーレイ */
+  .bg-blur {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    backdrop-filter: blur(12px);
+    background-color: rgba(0,0,0,0.35);
+    z-index: -1;
   }
   .device {
     position: relative;
     width: 390px;
     height: 844px;
-    background: #222;
+    background: rgba(34, 34, 34, 0.85);
     border-radius: 60px;
     box-shadow: 0 0 40px #555 inset;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
   }
   .screen {
-    position: absolute;
-    top: 44px;
-    left: 0;
-    right: 0;
-    bottom: 34px;
+    flex-grow: 1;
     background: #111;
     border-radius: 48px 48px 36px 36px;
     padding: 20px 24px;
     display: flex;
     flex-direction: column;
-    user-select: none;
   }
   .status-bar {
     height: 44px;
@@ -118,7 +128,9 @@
 </head>
 <body>
 
-<div class="device" role="region" aria-label="モノクロスマホ通知モック">
+<div class="bg-blur"></div>
+
+<div class="device" role="region" aria-label="風景背景のスマホ通知モック">
   <div class="screen">
 
     <div class="status-bar">
@@ -169,7 +181,6 @@
 
     container.prepend(notif);
 
-    // 強制再描画してからclass追加でトランジション発動
     requestAnimationFrame(() => {
       notif.classList.add('show');
     });
