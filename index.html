@@ -3,107 +3,177 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>スマホ通知モック</title>
+<title>映画用スマホ通知モック</title>
 <style>
-  body {
-    background: #eee;
+  @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%;
+    background: #000;
     display: flex;
     justify-content: center;
-    padding: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
   }
+
   .phone {
-    width: 360px;
-    height: 640px;
-    background: #fff;
-    border-radius: 30px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
     position: relative;
-    padding: 60px 20px 20px;
+    width: 400px;
+    height: 720px;
+    background: linear-gradient(145deg, #222, #111);
+    border-radius: 40px;
+    box-shadow:
+      0 0 20px #0ff,
+      inset 0 0 40px #0ff;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 50px 30px 30px;
     box-sizing: border-box;
   }
+
   .status-bar {
-    position: absolute;
-    top: 15px;
-    left: 20px;
-    right: 20px;
-    height: 20px;
-    color: #666;
+    height: 24px;
+    color: #0ff;
     font-size: 14px;
     display: flex;
     justify-content: space-between;
+    margin-bottom: 10px;
   }
+
   .notifications {
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 15px;
+    position: relative;
   }
+
   .notification {
-    background: #f9f9f9;
-    border-radius: 12px;
-    padding: 12px 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background: rgba(0,255,255,0.1);
+    border: 1px solid #0ff;
+    border-radius: 16px;
+    padding: 15px 20px;
+    color: #0ff;
+    box-shadow: 0 0 10px #0ff88;
     display: flex;
-    gap: 12px;
-    align-items: center;
+    gap: 15px;
+    opacity: 0;
+    transform: translateX(100%);
+    animation-fill-mode: forwards;
   }
+
+  .notification.show {
+    animation: slideIn 0.8s forwards;
+  }
+
   .icon {
-    width: 40px;
-    height: 40px;
-    background: #ddd;
-    border-radius: 8px;
-    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    background: #0ff;
+    border-radius: 12px;
+    color: #000;
+    font-weight: bold;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
-    color: #555;
-    font-size: 18px;
+    font-size: 24px;
+    user-select: none;
   }
+
   .content {
     flex-grow: 1;
   }
+
   .title {
+    font-size: 18px;
     font-weight: 700;
-    font-size: 16px;
-    margin-bottom: 4px;
-    color: #222;
+    margin-bottom: 6px;
   }
+
   .message {
-    font-size: 14px;
-    color: #555;
+    font-size: 15px;
+    line-height: 1.3;
   }
+
   .time {
-    font-size: 12px;
-    color: #999;
-    flex-shrink: 0;
+    font-size: 13px;
+    opacity: 0.7;
+    user-select: none;
+    align-self: flex-start;
+  }
+
+  @keyframes slideIn {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 </style>
 </head>
 <body>
-  <div class="phone" role="region" aria-label="スマホ通知画面モック">
-    <div class="status-bar">
-      <div>9:41</div>
-      <div>🔋 100%</div>
-    </div>
-    <div class="notifications">
-      <div class="notification">
-        <div class="icon">A</div>
-        <div class="content">
-          <div class="title">新着メッセージ</div>
-          <div class="message">こんにちは！明日の予定を確認しましょう。</div>
-        </div>
-        <div class="time">今</div>
-      </div>
-      <div class="notification">
-        <div class="icon">B</div>
-        <div class="content">
-          <div class="title">ニュース速報</div>
-          <div class="message">天気予報に大雨警報が出ています。</div>
-        </div>
-        <div class="time">5分前</div>
-      </div>
-    </div>
+
+<div class="phone" role="region" aria-label="スマホ通知モック映画用">
+  <div class="status-bar">
+    <div>9:41</div>
+    <div>🔋 97%</div>
   </div>
+  <div class="notifications" id="notifications"></div>
+</div>
+
+<script>
+  const notificationsData = [
+    { icon: '📩', title: '新着メール', message: '大切なメールが届きました。確認してください。', time: '今' },
+    { icon: '⚠️', title: 'セキュリティ警告', message: '不審なログインを検出しました。', time: '3分前' },
+    { icon: '📰', title: 'ニュース速報', message: '明日は大雨の予報です。お気をつけください。', time: '10分前' },
+  ];
+
+  const container = document.getElementById('notifications');
+
+  let index = 0;
+
+  function showNotification() {
+    if(index >= notificationsData.length) index = 0;
+
+    const data = notificationsData[index];
+
+    // 新しい通知要素作成
+    const notif = document.createElement('div');
+    notif.className = 'notification';
+    notif.innerHTML = `
+      <div class="icon">${data.icon}</div>
+      <div class="content">
+        <div class="title">${data.title}</div>
+        <div class="message">${data.message}</div>
+      </div>
+      <div class="time">${data.time}</div>
+    `;
+    container.appendChild(notif);
+
+    // アニメーション付与でスライドイン表示
+    requestAnimationFrame(() => {
+      notif.classList.add('show');
+    });
+
+    // 5秒後に通知をフェードアウトして削除
+    setTimeout(() => {
+      notif.style.transition = 'opacity 0.8s, transform 0.8s';
+      notif.style.opacity = '0';
+      notif.style.transform = 'translateX(-100%)';
+      setTimeout(() => {
+        notif.remove();
+      }, 800);
+    }, 5000);
+
+    index++;
+  }
+
+  // 1秒間隔で通知表示（ループ）
+  showNotification();
+  setInterval(showNotification, 1500);
+</script>
+
 </body>
 </html>
