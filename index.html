@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>リアルなスマホ通知モック</title>
+<title>スマホ通知モック（未読・期限切れ通知）</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;700&display=swap');
 
-  /* Reset */
   * {
     box-sizing: border-box;
   }
@@ -25,36 +24,33 @@
     overflow: hidden;
   }
 
-  /* スマホ本体の外枠 */
   .device {
     position: relative;
-    width: 390px;  /* iPhone 13/14 の画面幅 */
-    height: 844px; /* iPhone 13/14 の画面高さ */
+    width: 390px;
+    height: 844px;
     background: black;
     border-radius: 60px;
     box-shadow:
-      0 0 40px rgba(0, 255, 255, 0.5),
-      inset 0 0 10px #0ff,
-      inset 0 0 25px #0ff;
+      0 0 40px rgba(0, 123, 255, 0.7),
+      inset 0 0 10px #07f,
+      inset 0 0 25px #07f;
     overflow: hidden;
   }
 
-  /* 画面（液晶部分） */
   .screen {
     position: absolute;
-    top: 44px; /* ステータスバー＋ノッチの高さ */
+    top: 44px;
     left: 0;
     right: 0;
-    bottom: 34px; /* 下のホームバー部分の高さ */
+    bottom: 34px;
     background: #121212;
     border-radius: 48px 48px 36px 36px;
-    box-shadow: inset 0 0 40px #0ff33;
+    box-shadow: inset 0 0 40px #0766ff33;
     padding: 0 0 20px;
     display: flex;
     flex-direction: column;
   }
 
-  /* ノッチ（切り欠き） */
   .notch {
     position: absolute;
     top: 0; left: 50%;
@@ -63,11 +59,10 @@
     height: 30px;
     background: black;
     border-radius: 0 0 30px 30px;
-    box-shadow: inset 0 0 6px #0ff;
+    box-shadow: inset 0 0 6px #07f;
     z-index: 10;
   }
 
-  /* スピーカー穴 */
   .speaker {
     position: absolute;
     top: 8px;
@@ -77,14 +72,13 @@
     height: 6px;
     background: #222;
     border-radius: 3px;
-    box-shadow: 0 0 5px #0ff inset;
+    box-shadow: 0 0 5px #07f inset;
   }
 
-  /* ステータスバー */
   .status-bar {
     position: relative;
     height: 44px;
-    color: #0ff;
+    color: #07f;
     font-size: 14px;
     display: flex;
     justify-content: space-between;
@@ -95,7 +89,6 @@
     user-select: none;
   }
 
-  /* 通信やWi-Fi (左側のアイコン群) */
   .status-left {
     display: flex;
     gap: 6px;
@@ -103,7 +96,6 @@
     align-items: center;
   }
 
-  /* バッテリー (右側) */
   .status-right {
     display: flex;
     gap: 8px;
@@ -111,59 +103,71 @@
     font-size: 14px;
   }
 
-  /* 大きな時間表示 */
   .large-time {
     text-align: center;
     font-size: 96px;
     font-weight: 900;
-    color: #0ff;
+    color: #07f;
     margin: 20px 0 30px;
     font-family: 'Courier New', Courier, monospace;
     user-select: none;
     flex-shrink: 0;
   }
 
-  /* 通知エリア */
   .notifications {
     flex-grow: 1;
     padding: 0 24px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
     overflow-y: auto;
   }
 
-  /* iOS風通知カード */
-  .notification {
-    background: rgba(0, 255, 255, 0.1);
-    border-radius: 22px;
+  /* 未読メール通知ブルー */
+  .notification.unread {
+    background: rgba(0, 123, 255, 0.15);
+    border-radius: 20px;
     padding: 16px 24px;
     display: flex;
     gap: 20px;
     align-items: center;
-    color: #0ff;
+    color: #07f;
     box-shadow:
-      0 4px 16px rgba(0, 255, 255, 0.3),
-      inset 0 0 12px rgba(0, 255, 255, 0.6);
+      0 4px 16px rgba(0, 123, 255, 0.4),
+      inset 0 0 12px rgba(0, 123, 255, 0.6);
     opacity: 0;
     transform: translateX(100%);
     animation-fill-mode: forwards;
   }
 
-  .notification.show {
-    animation: slideIn 0.8s forwards;
+  /* 期限切れ通知レッド */
+  .notification.expired {
+    background: rgba(255, 50, 50, 0.2);
+    border-radius: 20px;
+    padding: 16px 24px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    color: #ff3333;
+    box-shadow:
+      0 4px 16px rgba(255, 50, 50, 0.5),
+      inset 0 0 12px rgba(255, 50, 50, 0.7);
+    opacity: 0;
+    transform: translateX(100%);
+    animation-fill-mode: forwards;
   }
 
   .icon {
-    font-size: 32px;
+    font-size: 36px;
     flex-shrink: 0;
-    width: 50px;
-    height: 50px;
+    width: 52px;
+    height: 52px;
     border-radius: 14px;
-    background: rgba(0, 255, 255, 0.3);
+    background: rgba(0,0,0,0.2);
     display: flex;
     justify-content: center;
     align-items: center;
+    user-select: none;
   }
 
   .content {
@@ -174,47 +178,34 @@
     font-weight: 700;
     font-size: 18px;
     margin-bottom: 6px;
-    text-shadow: 0 0 8px #0ff99;
+    text-shadow: 0 0 8px currentColor;
   }
 
   .message {
-    font-size: 15px;
-    color: #b0f0f0;
+    font-size: 16px;
+    font-weight: 600;
+    color: currentColor;
     line-height: 1.3;
   }
 
   .time {
-    font-size: 13px;
-    color: #88e0e0;
+    font-size: 14px;
+    color: currentColor;
     user-select: none;
     flex-shrink: 0;
   }
 
-  /* スライドインアニメーション */
   @keyframes slideIn {
     to {
       opacity: 1;
       transform: translateX(0);
     }
   }
-
-  /* 下のホームバー（iPhoneっぽい） */
-  .home-bar {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 134px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 40px;
-    box-shadow: 0 0 10px rgba(0,255,255,0.4);
-  }
 </style>
 </head>
 <body>
 
-<div class="device" role="region" aria-label="iPhone風スマホ通知モック">
+<div class="device" role="region" aria-label="スマホ通知モック（未読・期限切れ）">
 
   <div class="notch"></div>
   <div class="speaker"></div>
@@ -244,20 +235,31 @@
 
 <script>
   const notificationsData = [
-    { icon: '💬', title: 'メッセージ', message: '今すぐチェックしてください。', time: '今' },
-    { icon: '📢', title: 'アップデート', message: '新しいバージョンが利用可能です。', time: '1分前' },
-    { icon: '⚠️', title: '警告', message: 'パスワードの変更を推奨します。', time: '5分前' },
+    {
+      type: 'unread',
+      icon: '📧',
+      title: '未読メール',
+      message: '未読14件あります。',
+      time: '今'
+    },
+    {
+      type: 'expired',
+      icon: '⏰',
+      title: '期限切れ',
+      message: '期限切れタスク3件があります。',
+      time: '1時間前'
+    }
   ];
 
   const container = document.getElementById('notifications');
   let index = 0;
 
   function showNotification() {
-    if (index >= notificationsData.length) index = 0;
+    if(index >= notificationsData.length) index = 0;
     const data = notificationsData[index];
 
     const notif = document.createElement('div');
-    notif.className = 'notification';
+    notif.className = 'notification ' + data.type;
     notif.innerHTML = `
       <div class="icon">${data.icon}</div>
       <div class="content">
@@ -266,6 +268,7 @@
       </div>
       <div class="time">${data.time}</div>
     `;
+
     container.prepend(notif);
 
     requestAnimationFrame(() => {
@@ -279,15 +282,15 @@
       setTimeout(() => {
         notif.remove();
       }, 800);
-    }, 6000);
+    }, 7000);
 
     index++;
   }
 
   function updateTime() {
     const now = new Date();
-    const h = now.getHours().toString().padStart(2, '0');
-    const m = now.getMinutes().toString().padStart(2, '0');
+    const h = now.getHours().toString().padStart(2,'0');
+    const m = now.getMinutes().toString().padStart(2,'0');
     const timeStr = `${h}:${m}`;
     document.getElementById('status-time').textContent = timeStr;
     document.getElementById('large-time').textContent = timeStr;
@@ -297,7 +300,7 @@
   setInterval(updateTime, 60000);
 
   showNotification();
-  setInterval(showNotification, 2000);
+  setInterval(showNotification, 3000);
 </script>
 
 </body>
