@@ -2,83 +2,168 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>スマホ通知モック（時間・バッテリー付き）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>リアルなスマホ通知モック</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;700&display=swap');
+
+  /* Reset */
+  * {
+    box-sizing: border-box;
+  }
+
   html, body {
     margin: 0; padding: 0;
     height: 100%;
-    background: rgba(0,0,0,0.7);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    overflow: hidden;
+    background: #111;
     display: flex;
     justify-content: center;
-    box-sizing: border-box;
-  }
-
-  body {
-    flex-direction: column;
     align-items: center;
-    padding-top: 40px;
+    font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
   }
 
+  /* スマホ本体の外枠 */
+  .device {
+    position: relative;
+    width: 390px;  /* iPhone 13/14 の画面幅 */
+    height: 844px; /* iPhone 13/14 の画面高さ */
+    background: black;
+    border-radius: 60px;
+    box-shadow:
+      0 0 40px rgba(0, 255, 255, 0.5),
+      inset 0 0 10px #0ff,
+      inset 0 0 25px #0ff;
+    overflow: hidden;
+  }
+
+  /* 画面（液晶部分） */
+  .screen {
+    position: absolute;
+    top: 44px; /* ステータスバー＋ノッチの高さ */
+    left: 0;
+    right: 0;
+    bottom: 34px; /* 下のホームバー部分の高さ */
+    background: #121212;
+    border-radius: 48px 48px 36px 36px;
+    box-shadow: inset 0 0 40px #0ff33;
+    padding: 0 0 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ノッチ（切り欠き） */
+  .notch {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 210px;
+    height: 30px;
+    background: black;
+    border-radius: 0 0 30px 30px;
+    box-shadow: inset 0 0 6px #0ff;
+    z-index: 10;
+  }
+
+  /* スピーカー穴 */
+  .speaker {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 6px;
+    background: #222;
+    border-radius: 3px;
+    box-shadow: 0 0 5px #0ff inset;
+  }
+
+  /* ステータスバー */
   .status-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 36px;
-    background: rgba(0,0,0,0.9);
-    color: #eee;
-    font-size: 16px;
+    position: relative;
+    height: 44px;
+    color: #0ff;
+    font-size: 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
-    box-sizing: border-box;
-    user-select: none;
-    z-index: 1000;
+    padding: 0 24px;
     font-weight: 600;
     font-family: 'Courier New', Courier, monospace;
+    user-select: none;
   }
 
+  /* 通信やWi-Fi (左側のアイコン群) */
+  .status-left {
+    display: flex;
+    gap: 6px;
+    font-size: 14px;
+    align-items: center;
+  }
+
+  /* バッテリー (右側) */
+  .status-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  /* 大きな時間表示 */
+  .large-time {
+    text-align: center;
+    font-size: 96px;
+    font-weight: 900;
+    color: #0ff;
+    margin: 20px 0 30px;
+    font-family: 'Courier New', Courier, monospace;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  /* 通知エリア */
   .notifications {
-    margin-top: 40px; /* ステータスバー分 */
-    width: 100%;
-    max-width: 420px;
-    padding: 0 20px;
+    flex-grow: 1;
+    padding: 0 24px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
+    overflow-y: auto;
   }
 
+  /* iOS風通知カード */
   .notification {
-    background: #222;
-    border-radius: 14px;
-    padding: 16px 20px;
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+    background: rgba(0, 255, 255, 0.1);
+    border-radius: 22px;
+    padding: 16px 24px;
     display: flex;
-    gap: 16px;
+    gap: 20px;
     align-items: center;
+    color: #0ff;
+    box-shadow:
+      0 4px 16px rgba(0, 255, 255, 0.3),
+      inset 0 0 12px rgba(0, 255, 255, 0.6);
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateX(100%);
     animation-fill-mode: forwards;
   }
 
   .notification.show {
-    animation: slideUpFadeIn 0.6s forwards;
+    animation: slideIn 0.8s forwards;
   }
 
   .icon {
-    width: 48px;
-    height: 48px;
-    background: #444;
-    border-radius: 10px;
+    font-size: 32px;
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    background: rgba(0, 255, 255, 0.3);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px;
-    user-select: none;
-    flex-shrink: 0;
   }
 
   .content {
@@ -87,38 +172,75 @@
 
   .title {
     font-weight: 700;
-    font-size: 17px;
-    margin-bottom: 4px;
+    font-size: 18px;
+    margin-bottom: 6px;
+    text-shadow: 0 0 8px #0ff99;
   }
 
   .message {
     font-size: 15px;
+    color: #b0f0f0;
     line-height: 1.3;
-    color: #ccc;
   }
 
   .time {
     font-size: 13px;
-    color: #888;
+    color: #88e0e0;
     user-select: none;
+    flex-shrink: 0;
   }
 
-  @keyframes slideUpFadeIn {
+  /* スライドインアニメーション */
+  @keyframes slideIn {
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateX(0);
     }
+  }
+
+  /* 下のホームバー（iPhoneっぽい） */
+  .home-bar {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 134px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0,255,255,0.4);
   }
 </style>
 </head>
 <body>
 
-<div class="status-bar">
-  <div id="current-time">9:41</div>
-  <div id="battery">🔋 97%</div>
-</div>
+<div class="device" role="region" aria-label="iPhone風スマホ通知モック">
 
-<div class="notifications" id="notifications"></div>
+  <div class="notch"></div>
+  <div class="speaker"></div>
+
+  <div class="screen">
+
+    <div class="status-bar">
+      <div class="status-left">
+        <span>📶</span>
+        <span>Wi-Fi</span>
+      </div>
+      <div id="status-time">9:41</div>
+      <div class="status-right">
+        <span>🔋</span>
+        <span id="battery-percentage">97%</span>
+      </div>
+    </div>
+
+    <div class="large-time" id="large-time">9:41</div>
+
+    <div class="notifications" id="notifications"></div>
+
+  </div>
+
+  <div class="home-bar"></div>
+</div>
 
 <script>
   const notificationsData = [
@@ -153,7 +275,7 @@
     setTimeout(() => {
       notif.style.transition = 'opacity 0.8s, transform 0.8s';
       notif.style.opacity = '0';
-      notif.style.transform = 'translateY(-30px)';
+      notif.style.transform = 'translateX(100%)';
       setTimeout(() => {
         notif.remove();
       }, 800);
@@ -166,7 +288,9 @@
     const now = new Date();
     const h = now.getHours().toString().padStart(2, '0');
     const m = now.getMinutes().toString().padStart(2, '0');
-    document.getElementById('current-time').textContent = `${h}:${m}`;
+    const timeStr = `${h}:${m}`;
+    document.getElementById('status-time').textContent = timeStr;
+    document.getElementById('large-time').textContent = timeStr;
   }
 
   updateTime();
