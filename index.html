@@ -3,14 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>スマホ通知モック（未読・期限切れ通知）</title>
+<title>モノクロ通知モック</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;700&display=swap');
-
   * {
     box-sizing: border-box;
   }
-
   html, body {
     margin: 0; padding: 0;
     height: 100%;
@@ -18,232 +15,133 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #ddd;
     overflow: hidden;
   }
-
   .device {
     position: relative;
     width: 390px;
     height: 844px;
-    background: black;
+    background: #222;
     border-radius: 60px;
-    box-shadow:
-      0 0 40px rgba(0, 123, 255, 0.7),
-      inset 0 0 10px #07f,
-      inset 0 0 25px #07f;
+    box-shadow: 0 0 40px #555 inset;
     overflow: hidden;
   }
-
   .screen {
     position: absolute;
     top: 44px;
     left: 0;
     right: 0;
     bottom: 34px;
-    background: #121212;
+    background: #111;
     border-radius: 48px 48px 36px 36px;
-    box-shadow: inset 0 0 40px #0766ff33;
-    padding: 0 0 20px;
+    padding: 20px 24px;
     display: flex;
     flex-direction: column;
+    user-select: none;
   }
-
-  .notch {
-    position: absolute;
-    top: 0; left: 50%;
-    transform: translateX(-50%);
-    width: 210px;
-    height: 30px;
-    background: black;
-    border-radius: 0 0 30px 30px;
-    box-shadow: inset 0 0 6px #07f;
-    z-index: 10;
-  }
-
-  .speaker {
-    position: absolute;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 6px;
-    background: #222;
-    border-radius: 3px;
-    box-shadow: 0 0 5px #07f inset;
-  }
-
   .status-bar {
-    position: relative;
     height: 44px;
-    color: #07f;
+    color: #ccc;
     font-size: 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 24px;
+    padding: 0 16px;
     font-weight: 600;
-    font-family: 'Courier New', Courier, monospace;
-    user-select: none;
+    font-family: monospace;
   }
-
-  .status-left {
-    display: flex;
-    gap: 6px;
-    font-size: 14px;
-    align-items: center;
-  }
-
-  .status-right {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    font-size: 14px;
-  }
-
   .large-time {
     text-align: center;
     font-size: 96px;
     font-weight: 900;
-    color: #07f;
+    color: #eee;
     margin: 20px 0 30px;
-    font-family: 'Courier New', Courier, monospace;
-    user-select: none;
+    font-family: monospace;
     flex-shrink: 0;
   }
-
   .notifications {
     flex-grow: 1;
-    padding: 0 24px;
     display: flex;
     flex-direction: column;
     gap: 20px;
     overflow-y: auto;
   }
-
-  /* 未読メール通知ブルー */
-  .notification.unread {
-    background: rgba(0, 123, 255, 0.15);
+  .notification {
+    background: #333;
     border-radius: 20px;
     padding: 16px 24px;
     display: flex;
     gap: 20px;
     align-items: center;
-    color: #07f;
-    box-shadow:
-      0 4px 16px rgba(0, 123, 255, 0.4),
-      inset 0 0 12px rgba(0, 123, 255, 0.6);
+    color: #eee;
     opacity: 0;
-    transform: translateX(100%);
-    animation-fill-mode: forwards;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
   }
-
-  /* 期限切れ通知レッド */
-  .notification.expired {
-    background: rgba(255, 50, 50, 0.2);
-    border-radius: 20px;
-    padding: 16px 24px;
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    color: #ff3333;
-    box-shadow:
-      0 4px 16px rgba(255, 50, 50, 0.5),
-      inset 0 0 12px rgba(255, 50, 50, 0.7);
-    opacity: 0;
-    transform: translateX(100%);
-    animation-fill-mode: forwards;
+  .notification.show {
+    opacity: 1;
+    transform: translateY(0);
   }
-
   .icon {
     font-size: 36px;
-    flex-shrink: 0;
     width: 52px;
     height: 52px;
     border-radius: 14px;
-    background: rgba(0,0,0,0.2);
+    background: #444;
     display: flex;
     justify-content: center;
     align-items: center;
-    user-select: none;
+    flex-shrink: 0;
   }
-
   .content {
     flex-grow: 1;
   }
-
   .title {
     font-weight: 700;
     font-size: 18px;
     margin-bottom: 6px;
-    text-shadow: 0 0 8px currentColor;
   }
-
   .message {
     font-size: 16px;
     font-weight: 600;
-    color: currentColor;
+    color: #ccc;
     line-height: 1.3;
   }
-
   .time {
     font-size: 14px;
-    color: currentColor;
-    user-select: none;
+    color: #aaa;
     flex-shrink: 0;
-  }
-
-  @keyframes slideIn {
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
   }
 </style>
 </head>
 <body>
 
-<div class="device" role="region" aria-label="スマホ通知モック（未読・期限切れ）">
-
-  <div class="notch"></div>
-  <div class="speaker"></div>
-
+<div class="device" role="region" aria-label="モノクロスマホ通知モック">
   <div class="screen">
 
     <div class="status-bar">
-      <div class="status-left">
-        <span>📶</span>
-        <span>Wi-Fi</span>
-      </div>
-      <div id="status-time">9:41</div>
-      <div class="status-right">
-        <span>🔋</span>
-        <span id="battery-percentage">97%</span>
-      </div>
+      <div>📶 Wi-Fi</div>
+      <div id="status-time">09:41</div>
+      <div>🔋 97%</div>
     </div>
 
-    <div class="large-time" id="large-time">9:41</div>
+    <div class="large-time" id="large-time">09:41</div>
 
     <div class="notifications" id="notifications"></div>
-
   </div>
-
-  <div class="home-bar"></div>
 </div>
 
 <script>
   const notificationsData = [
     {
-      type: 'unread',
       icon: '📧',
       title: '未読メール',
       message: '未読14件あります。',
       time: '今'
     },
     {
-      type: 'expired',
       icon: '⏰',
       title: '期限切れ',
       message: '期限切れタスク3件があります。',
@@ -259,7 +157,7 @@
     const data = notificationsData[index];
 
     const notif = document.createElement('div');
-    notif.className = 'notification ' + data.type;
+    notif.className = 'notification';
     notif.innerHTML = `
       <div class="icon">${data.icon}</div>
       <div class="content">
@@ -271,18 +169,17 @@
 
     container.prepend(notif);
 
+    // 強制再描画してからclass追加でトランジション発動
     requestAnimationFrame(() => {
       notif.classList.add('show');
     });
 
     setTimeout(() => {
-      notif.style.transition = 'opacity 0.8s, transform 0.8s';
-      notif.style.opacity = '0';
-      notif.style.transform = 'translateX(100%)';
+      notif.classList.remove('show');
       setTimeout(() => {
         notif.remove();
-      }, 800);
-    }, 7000);
+      }, 600);
+    }, 6000);
 
     index++;
   }
