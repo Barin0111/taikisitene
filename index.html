@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>スマホ通知モック（画面いっぱい）</title>
+<title>スマホ通知モック（時間・バッテリー付き）</title>
 <style>
   html, body {
     margin: 0; padding: 0;
@@ -13,12 +13,35 @@
     overflow: hidden;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    padding-top: 40px;
     box-sizing: border-box;
   }
 
+  body {
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+  }
+
+  .status-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 36px;
+    background: rgba(0,0,0,0.9);
+    color: #eee;
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-sizing: border-box;
+    user-select: none;
+    z-index: 1000;
+    font-weight: 600;
+    font-family: 'Courier New', Courier, monospace;
+  }
+
   .notifications {
+    margin-top: 40px; /* ステータスバー分 */
     width: 100%;
     max-width: 420px;
     padding: 0 20px;
@@ -90,6 +113,11 @@
 </head>
 <body>
 
+<div class="status-bar">
+  <div id="current-time">9:41</div>
+  <div id="battery">🔋 97%</div>
+</div>
+
 <div class="notifications" id="notifications"></div>
 
 <script>
@@ -116,13 +144,12 @@
       </div>
       <div class="time">${data.time}</div>
     `;
-    container.prepend(notif); // 新しい通知は上に追加
+    container.prepend(notif);
 
     requestAnimationFrame(() => {
       notif.classList.add('show');
     });
 
-    // 6秒後に通知をフェードアウト＆削除
     setTimeout(() => {
       notif.style.transition = 'opacity 0.8s, transform 0.8s';
       notif.style.opacity = '0';
@@ -135,7 +162,16 @@
     index++;
   }
 
-  // 2秒ごとに通知表示（ループ）
+  function updateTime() {
+    const now = new Date();
+    const h = now.getHours().toString().padStart(2, '0');
+    const m = now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('current-time').textContent = `${h}:${m}`;
+  }
+
+  updateTime();
+  setInterval(updateTime, 60000);
+
   showNotification();
   setInterval(showNotification, 2000);
 </script>
