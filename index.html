@@ -11,7 +11,7 @@
   html, body {
     margin: 0; padding: 0;
     height: 100%;
-    background: #111;
+    background: black; /* 灰色ではなく真っ黒 */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: #eee;
     overflow: hidden;
@@ -23,11 +23,16 @@
     position: relative;
     width: 390px;
     height: 844px;
-    background: #222;
+    background: #000;
     border-radius: 60px;
     box-shadow: 0 0 40px #555 inset;
     overflow: hidden;
     user-select: none;
+    opacity: 0; /* ← 最初は非表示にしておく */
+    transition: opacity 0.3s ease;
+  }
+  .device.loaded {
+    opacity: 1; /* 画像ロード完了後に表示 */
   }
   .screen {
     flex-grow: 1;
@@ -79,6 +84,7 @@
     flex-direction: column;
     gap: 20px;
     overflow-y: hidden; /* スクロールバー非表示 */
+    max-height: 100%; /* 物理的にスクロール発生しないようにする */
   }
   .notification {
     background: rgba(0,0,0,0.6);
@@ -91,6 +97,7 @@
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.6s ease, transform 0.6s ease;
+    flex-shrink: 0; /* 高さ変動防止 */
   }
   .notification.show {
     opacity: 1;
@@ -130,7 +137,7 @@
 </head>
 <body>
 
-<div class="device" role="region" aria-label="通知背景が風景でスクロールバー非表示モック">
+<div class="device" id="device">
   <div class="screen">
 
     <div class="status-bar">
@@ -147,21 +154,12 @@
 
 <script>
   const notificationsData = [
-    {
-      icon: '📧',
-      title: '未読メール',
-      message: '未読14件あります。',
-      time: '今'
-    },
-    {
-      icon: '⏰',
-      title: '期限切れ',
-      message: '期限切れタスク3件があります。',
-      time: '1時間前'
-    }
+    { icon: '📧', title: '未読メール', message: '未読14件あります。', time: '今' },
+    { icon: '⏰', title: '期限切れ', message: '期限切れタスク3件があります。', time: '1時間前' }
   ];
 
   const container = document.getElementById('notifications');
+  const device = document.getElementById('device');
   let index = 0;
 
   function showNotification() {
@@ -181,15 +179,11 @@
 
     container.prepend(notif);
 
-    requestAnimationFrame(() => {
-      notif.classList.add('show');
-    });
+    requestAnimationFrame(() => notif.classList.add('show'));
 
     setTimeout(() => {
       notif.classList.remove('show');
-      setTimeout(() => {
-        notif.remove();
-      }, 600);
+      setTimeout(() => notif.remove(), 600);
     }, 6000);
 
     index++;
@@ -204,11 +198,16 @@
     document.getElementById('large-time').textContent = timeStr;
   }
 
-  updateTime();
-  setInterval(updateTime, 60000);
-
-  showNotification();
-  setInterval(showNotification, 3000);
+  // 背景画像プリロード
+  const img = new Image();
+  img.src = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1280&q=80';
+  img.onload = () => {
+    device.classList.add('loaded'); // 表示開始
+    updateTime();
+    setInterval(updateTime, 60000);
+    showNotification();
+    setInterval(showNotification, 3000);
+  };
 </script>
 
 </body>
