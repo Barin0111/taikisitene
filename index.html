@@ -5,36 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>通知モック</title>
   <link rel="stylesheet" href="style.css" />
-
-  <!-- PWA用 -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#000000">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-
   <script src="script.js" defer></script>
 </head>
 <body>
   <!-- ステータスバー -->
   <div class="status-bar">
-    <div class="status-left">
-      📶 LTE
-    </div>
+    <div class="status-left">📶 LTE</div>
     <div class="status-center">
       <span class="time" id="timeDisplay">--:--</span>
     </div>
-    <div class="status-right">
-      📡 🔋100%
-    </div>
+    <div class="status-right">🔋100%</div>
   </div>
 
-  <!-- 大きい時計 -->
-  <div class="big-clock" id="bigClock">--:--</div>
+  <!-- ロック画面風の大きな時計 -->
+  <div class="lock-screen-time">
+    <div class="big-clock" id="bigClock">--:--</div>
+    <div class="lock-screen-date" id="dateDisplay">----</div>
+  </div>
 
   <!-- 通知エリア -->
   <div class="notifications" id="notifications"></div>
 
-  <!-- 全画面ボタン -->
-  <button id="fullscreenBtn" class="fullscreen-btn">全画面表示</button>
+
 </body>
 </html>
