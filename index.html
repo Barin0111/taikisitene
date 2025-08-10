@@ -1,61 +1,43 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>通知背景が風景でスクロールバー非表示モック</title>
 <style>
-  * {
-    box-sizing: border-box;
-  }
   html, body {
     margin: 0; padding: 0;
     height: 100%;
-    background: black; /* 灰色ではなく真っ黒 */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: #eee;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
+    background: black;
   }
   .device {
     position: relative;
     width: 390px;
     height: 844px;
-    background: #000;
     border-radius: 60px;
-    box-shadow: 0 0 40px #555 inset;
     overflow: hidden;
-    user-select: none;
-    opacity: 0; /* ← 最初は非表示にしておく */
+    box-shadow: 0 0 40px #555 inset;
+    opacity: 0;
     transition: opacity 0.3s ease;
+    background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1280&q=80') no-repeat center center;
+    background-size: cover; /* ← これで全画面風景 */
   }
   .device.loaded {
-    opacity: 1; /* 画像ロード完了後に表示 */
+    opacity: 1;
   }
-  .screen {
-    flex-grow: 1;
-    background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1280&q=80') no-repeat center center fixed;
-    background-size: cover;
-    border-radius: 48px 48px 36px 36px;
-    padding: 20px 24px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    color: #eee;
-  }
-  .screen::before {
-    content: "";
+  /* 暗いオーバーレイ */
+  .overlay {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.5);
-    border-radius: 48px 48px 36px 36px;
-    pointer-events: none;
     z-index: 0;
   }
-  .screen > * {
+  .screen {
     position: relative;
+    padding: 20px 24px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     z-index: 1;
   }
   .status-bar {
@@ -65,7 +47,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 16px;
     font-weight: 600;
     font-family: monospace;
   }
@@ -73,9 +54,7 @@
     text-align: center;
     font-size: 96px;
     font-weight: 900;
-    color: #eee;
     margin: 20px 0 30px;
-    font-family: monospace;
     flex-shrink: 0;
   }
   .notifications {
@@ -83,8 +62,8 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    overflow-y: hidden; /* スクロールバー非表示 */
-    max-height: 100%; /* 物理的にスクロール発生しないようにする */
+    overflow-y: hidden;
+    max-height: 100%;
   }
   .notification {
     background: rgba(0,0,0,0.6);
@@ -93,11 +72,10 @@
     display: flex;
     gap: 20px;
     align-items: center;
-    color: #eee;
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.6s ease, transform 0.6s ease;
-    flex-shrink: 0; /* 高さ変動防止 */
+    flex-shrink: 0;
   }
   .notification.show {
     opacity: 1;
@@ -112,7 +90,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-shrink: 0;
   }
   .content {
     flex-grow: 1;
@@ -131,23 +108,18 @@
   .time {
     font-size: 14px;
     color: #aaa;
-    flex-shrink: 0;
   }
 </style>
-</head>
-<body>
 
 <div class="device" id="device">
+  <div class="overlay"></div>
   <div class="screen">
-
     <div class="status-bar">
       <div>📶 Wi-Fi</div>
       <div id="status-time">09:41</div>
       <div>🔋 97%</div>
     </div>
-
     <div class="large-time" id="large-time">09:41</div>
-
     <div class="notifications" id="notifications"></div>
   </div>
 </div>
@@ -157,7 +129,6 @@
     { icon: '📧', title: '未読メール', message: '未読14件あります。', time: '今' },
     { icon: '⏰', title: '期限切れ', message: '期限切れタスク3件があります。', time: '1時間前' }
   ];
-
   const container = document.getElementById('notifications');
   const device = document.getElementById('device');
   let index = 0;
@@ -165,7 +136,6 @@
   function showNotification() {
     if(index >= notificationsData.length) index = 0;
     const data = notificationsData[index];
-
     const notif = document.createElement('div');
     notif.className = 'notification';
     notif.innerHTML = `
@@ -176,16 +146,12 @@
       </div>
       <div class="time">${data.time}</div>
     `;
-
     container.prepend(notif);
-
     requestAnimationFrame(() => notif.classList.add('show'));
-
     setTimeout(() => {
       notif.classList.remove('show');
       setTimeout(() => notif.remove(), 600);
     }, 6000);
-
     index++;
   }
 
@@ -198,17 +164,14 @@
     document.getElementById('large-time').textContent = timeStr;
   }
 
-  // 背景画像プリロード
+  // 背景画像をプリロード
   const img = new Image();
   img.src = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1280&q=80';
   img.onload = () => {
-    device.classList.add('loaded'); // 表示開始
+    device.classList.add('loaded');
     updateTime();
     setInterval(updateTime, 60000);
     showNotification();
     setInterval(showNotification, 3000);
   };
 </script>
-
-</body>
-</html>
