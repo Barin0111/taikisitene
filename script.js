@@ -26,7 +26,14 @@ const icons = {
 };
 
 const notificationsData = [
-  { icon: 'message', text: '未読14件', detail: 'LINEの未読メッセージが14件あります。' },
+  { icon: 'message', text: '未読14件', detail: `
+      <ul>
+        <li>山田さんからのメッセージ</li>
+        <li>グループチャットの新着</li>
+        <li>田中さんから写真が届きました</li>
+      </ul>
+      ほか11件の未読があります。
+    `  },
   { icon: 'mail', text: '新しいメールがあります', detail: '受信トレイに3件の新着メールがあります。' },
   { icon: 'alert', text: '期限切れのタスクがあります', detail: '期限切れのタスクが2件あります。早急に対応してください。' }
 ];
