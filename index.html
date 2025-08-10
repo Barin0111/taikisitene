@@ -20,12 +20,11 @@
     opacity: 0;
     transition: opacity 0.3s ease;
     background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1280&q=80') no-repeat center center;
-    background-size: cover; /* ← これで全画面風景 */
+    background-size: cover;
   }
   .device.loaded {
     opacity: 1;
   }
-  /* 暗いオーバーレイ */
   .overlay {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -73,13 +72,13 @@
     gap: 20px;
     align-items: center;
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateX(100%); /* 横から出す初期位置 */
     transition: opacity 0.6s ease, transform 0.6s ease;
     flex-shrink: 0;
   }
   .notification.show {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0); /* 表示位置 */
   }
   .icon {
     font-size: 36px;
@@ -134,7 +133,7 @@
   let index = 0;
 
   function showNotification() {
-    if(index >= notificationsData.length) index = 0;
+    if (index >= notificationsData.length) return; // 一度だけ表示
     const data = notificationsData[index];
     const notif = document.createElement('div');
     notif.className = 'notification';
@@ -148,10 +147,6 @@
     `;
     container.prepend(notif);
     requestAnimationFrame(() => notif.classList.add('show'));
-    setTimeout(() => {
-      notif.classList.remove('show');
-      setTimeout(() => notif.remove(), 600);
-    }, 6000);
     index++;
   }
 
@@ -164,14 +159,14 @@
     document.getElementById('large-time').textContent = timeStr;
   }
 
-  // 背景画像をプリロード
   const img = new Image();
   img.src = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1280&q=80';
   img.onload = () => {
     device.classList.add('loaded');
     updateTime();
     setInterval(updateTime, 60000);
+    // 2件を順番に表示（横スライド）
     showNotification();
-    setInterval(showNotification, 3000);
+    setTimeout(showNotification, 2000);
   };
 </script>
