@@ -68,7 +68,11 @@ body {
 }
 
 .notification:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15); /* 少し濃く */
+}
+
+.notification.open {
+  background: rgba(255, 255, 255, 0.2); /* 開いた時はもう少し明るく目立つ */
 }
 
 .notification-header {
