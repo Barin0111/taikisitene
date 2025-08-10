@@ -1,172 +1,148 @@
-<style>
-  html, body {
-    margin: 0; padding: 0;
-    height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: #eee;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: black;
-  }
-  .device {
-    position: relative;
-    width: 390px;
-    height: 844px;
-    border-radius: 60px;
-    overflow: hidden;
-    box-shadow: 0 0 40px #555 inset;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1280&q=80') no-repeat center center;
-    background-size: cover;
-  }
-  .device.loaded {
-    opacity: 1;
-  }
-  .overlay {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 0;
-  }
-  .screen {
-    position: relative;
-    padding: 20px 24px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    z-index: 1;
-  }
-  .status-bar {
-    height: 44px;
-    color: #ccc;
-    font-size: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 600;
-    font-family: monospace;
-  }
-  .large-time {
-    text-align: center;
-    font-size: 96px;
-    font-weight: 900;
-    margin: 20px 0 30px;
-    flex-shrink: 0;
-  }
-  .notifications {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    overflow-y: hidden;
-    max-height: 100%;
-  }
-  .notification {
-    background: rgba(0,0,0,0.6);
-    border-radius: 20px;
-    padding: 16px 24px;
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    opacity: 0;
-    transform: translateX(100%); /* 横から出す初期位置 */
-    transition: opacity 0.6s ease, transform 0.6s ease;
-    flex-shrink: 0;
-  }
-  .notification.show {
-    opacity: 1;
-    transform: translateX(0); /* 表示位置 */
-  }
-  .icon {
-    font-size: 36px;
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    background: rgba(255,255,255,0.1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .content {
-    flex-grow: 1;
-  }
-  .title {
-    font-weight: 700;
-    font-size: 18px;
-    margin-bottom: 6px;
-  }
-  .message {
-    font-size: 16px;
-    font-weight: 600;
-    color: #ccc;
-    line-height: 1.3;
-  }
-  .time {
-    font-size: 14px;
-    color: #aaa;
-  }
-</style>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<div class="device" id="device">
-  <div class="overlay"></div>
-  <div class="screen">
-    <div class="status-bar">
-      <div>📶 Wi-Fi</div>
-      <div id="status-time">09:41</div>
-      <div>🔋 97%</div>
-    </div>
-    <div class="large-time" id="large-time">09:41</div>
-    <div class="notifications" id="notifications"></div>
+  <title>通知モック</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- PWA用 -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="status-bar">
+    <span class="time" id="timeDisplay">--:--</span>
+    <span class="battery">🔋100%</span>
   </div>
-</div>
 
-<script>
-  const notificationsData = [
-    { icon: '📧', title: '未読メール', message: '未読14件あります。', time: '今' },
-    { icon: '⏰', title: '期限切れ', message: '期限切れタスク3件があります。', time: '1時間前' }
-  ];
+  <div class="notifications" id="notifications"></div>
+
+  <button id="fullscreenBtn" class="fullscreen-btn">全画面表示</button>
+</body>
+</html>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overscroll-behavior: none;
+  background: black;
+  font-family: sans-serif;
+  color: white;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1280&q=80') no-repeat center center fixed;
+  background-size: cover;
+}
+
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
+  background: rgba(0,0,0,0.5);
+  font-size: 1.2em;
+}
+
+.notifications {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 15px;
+  overflow-y: hidden; /* スクロールバー非表示 */
+}
+
+.notification {
+  background: rgba(0,0,0,0.6);
+  padding: 15px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateX(100%);
+  animation: slideIn 0.5s forwards;
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fullscreen-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+// 時間表示更新
+function updateTime() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('timeDisplay').textContent = `${hours}:${minutes}`;
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+// 通知表示
+const notificationsData = [
+  { text: '未読14件' },
+  { text: '期限切れ' },
+  { text: '新しいメッセージがあります' }
+];
+
+function showNotifications() {
   const container = document.getElementById('notifications');
-  const device = document.getElementById('device');
-  let index = 0;
+  notificationsData.forEach((n, index) => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = 'notification';
+      div.textContent = n.text;
+      container.appendChild(div);
+    }, index * 1000);
+  });
+}
 
-  function showNotification() {
-    if (index >= notificationsData.length) return; // 一度だけ表示
-    const data = notificationsData[index];
-    const notif = document.createElement('div');
-    notif.className = 'notification';
-    notif.innerHTML = `
-      <div class="icon">${data.icon}</div>
-      <div class="content">
-        <div class="title">${data.title}</div>
-        <div class="message">${data.message}</div>
-      </div>
-      <div class="time">${data.time}</div>
-    `;
-    container.prepend(notif);
-    requestAnimationFrame(() => notif.classList.add('show'));
-    index++;
+document.addEventListener('DOMContentLoaded', showNotifications);
+
+// 全画面表示
+document.getElementById('fullscreenBtn').addEventListener('click', () => {
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen();
+  } else if (document.documentElement.webkitRequestFullscreen) {
+    document.documentElement.webkitRequestFullscreen(); // iOS Safari
   }
-
-  function updateTime() {
-    const now = new Date();
-    const h = now.getHours().toString().padStart(2,'0');
-    const m = now.getMinutes().toString().padStart(2,'0');
-    const timeStr = `${h}:${m}`;
-    document.getElementById('status-time').textContent = timeStr;
-    document.getElementById('large-time').textContent = timeStr;
-  }
-
-  const img = new Image();
-  img.src = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1280&q=80';
-  img.onload = () => {
-    device.classList.add('loaded');
-    updateTime();
-    setInterval(updateTime, 60000);
-    // 2件を順番に表示（横スライド）
-    showNotification();
-    setTimeout(showNotification, 2000);
-  };
-</script>
+});
+{
+  "name": "通知モック",
+  "short_name": "通知",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
