@@ -15,13 +15,26 @@
   <script src="script.js" defer></script>
 </head>
 <body>
+  <!-- ステータスバー -->
   <div class="status-bar">
-    <span class="time" id="timeDisplay">--:--</span>
-    <span class="battery">🔋100%</span>
+    <div class="status-left">
+      📶 LTE
+    </div>
+    <div class="status-center">
+      <span class="time" id="timeDisplay">--:--</span>
+    </div>
+    <div class="status-right">
+      📡 🔋100%
+    </div>
   </div>
 
+  <!-- 大きい時計 -->
+  <div class="big-clock" id="bigClock">--:--</div>
+
+  <!-- 通知エリア -->
   <div class="notifications" id="notifications"></div>
 
+  <!-- 全画面ボタン -->
   <button id="fullscreenBtn" class="fullscreen-btn">全画面表示</button>
 </body>
 </html>
