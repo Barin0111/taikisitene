@@ -13,7 +13,6 @@ function updateTime() {
 setInterval(updateTime, 1000);
 updateTime();
 
-// SVGアイコン（シンプル＆著作権フリーっぽい）
 const icons = {
   message: `<svg class="icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M2 3h20v14H6l-4 4V3z"/>
@@ -39,7 +38,6 @@ function showNotifications() {
       const div = document.createElement('div');
       div.className = 'notification';
 
-      // アイコン挿入
       div.innerHTML = `
         <div class="notification-header">
           ${icons[n.icon]}
@@ -50,12 +48,10 @@ function showNotifications() {
 
       container.appendChild(div);
 
-      // スライドインアニメーション開始
       requestAnimationFrame(() => {
         div.style.animation = 'slideIn 0.5s forwards';
       });
 
-      // クリックで詳細開閉
       div.addEventListener('click', () => {
         div.classList.toggle('open');
       });
@@ -65,7 +61,6 @@ function showNotifications() {
 
 document.addEventListener('DOMContentLoaded', showNotifications);
 
-// 全画面表示ボタン
 document.getElementById('fullscreenBtn').addEventListener('click', () => {
   if (document.documentElement.requestFullscreen) {
     document.documentElement.requestFullscreen();
