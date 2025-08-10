@@ -1,82 +1,55 @@
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overscroll-behavior: none;
-  background: black;
-  font-family: sans-serif;
-  color: white;
-}
-
-body {
-  display: flex;
-  flex-direction: column;
-  background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1280&q=80') no-repeat center center fixed;
-  background-size: cover;
-}
-
-/* ステータスバー */
-.status-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px 10px;
-  background: rgba(0,0,0,0.4);
-  font-size: 0.9em;
-}
-
-.status-left, .status-right {
-  min-width: 60px;
-}
-
-/* ロック画面風の時計 */
-.lock-screen-time {
-  text-align: center;
-  margin: 20px 0 10px;
-}
-
-.big-clock {
-  font-size: 4em;
-  font-weight: bold;
-  text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
-}
-
-.lock-screen-date {
-  font-size: 1.2em;
-  margin-top: 5px;
-  color: rgba(255,255,255,0.8);
-}
-
-/* 通知部分 */
-.notifications {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding: 15px;
-  overflow-y: hidden;
-}
+/* 前略（省略） */
 
 .notification {
   background: rgba(0,0,0,0.6);
   padding: 15px;
   border-radius: 8px;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
   opacity: 0;
   transform: translateX(100%);
+  transition: background 0.3s;
 }
 
-/* アイコン */
-.notification img {
+.notification:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.notification-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-svg {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  fill: white;
+  flex-shrink: 0;
 }
 
 .notification-text {
   flex-grow: 1;
+  font-size: 1.1em;
+  user-select: none;
+}
+
+/* 詳細テキスト（初期は非表示） */
+.notification-detail {
+  font-size: 0.9em;
+  color: #ccc;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  user-select: text;
+  padding-left: 50px; /* アイコンの分だけ左余白 */
+}
+
+/* 詳細開いたらmax-height大きく */
+.notification.open .notification-detail {
+  max-height: 500px; /* 十分な高さ */
 }
 
 /* スライドインアニメーション */
@@ -86,6 +59,8 @@ body {
     transform: translateX(0);
   }
 }
+
+/* 省略 */
 
 /* 全画面ボタン */
 .fullscreen-btn {
