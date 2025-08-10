@@ -29,17 +29,22 @@ body {
   min-width: 60px;
 }
 
-.status-center {
-  font-weight: bold;
+/* ロック画面風の時計 */
+.lock-screen-time {
+  text-align: center;
+  margin: 20px 0 10px;
 }
 
-/* 大きい時計 */
 .big-clock {
-  font-size: 3em;
-  text-align: center;
-  margin: 20px 0;
+  font-size: 4em;
   font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+}
+
+.lock-screen-date {
+  font-size: 1.2em;
+  margin-top: 5px;
+  color: rgba(255,255,255,0.8);
 }
 
 /* 通知部分 */
@@ -56,14 +61,14 @@ body {
   background: rgba(0,0,0,0.6);
   padding: 15px;
   border-radius: 8px;
-  opacity: 0;
-  transform: translateX(100%);
-  animation: slideIn 0.5s forwards;
   display: flex;
   align-items: center;
   gap: 10px;
+  opacity: 0;
+  transform: translateX(100%);
 }
 
+/* アイコン */
 .notification img {
   width: 40px;
   height: 40px;
@@ -74,7 +79,7 @@ body {
   flex-grow: 1;
 }
 
-/* アニメーション */
+/* スライドインアニメーション */
 @keyframes slideIn {
   to {
     opacity: 1;
