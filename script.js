@@ -1,4 +1,3 @@
-// 時計の更新
 function updateTime() {
   const now = new Date();
   const hours = String(now.getHours()).padStart(2, '0');
@@ -14,14 +13,25 @@ function updateTime() {
 setInterval(updateTime, 1000);
 updateTime();
 
-// 通知データ
+// SVGアイコン（シンプル＆著作権フリーっぽい）
+const icons = {
+  message: `<svg class="icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M2 3h20v14H6l-4 4V3z"/>
+  </svg>`,
+  mail: `<svg class="icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M2 4h20v16H2V4zm2 2v12h16V6H4zm8 5l8-6H4l8 6z"/>
+  </svg>`,
+  alert: `<svg class="icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2L2 22h20L12 2zm1 15h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+  </svg>`
+};
+
 const notificationsData = [
-  { icon: 'https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg', text: '未読14件' },
-  { icon: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Mail_%28iOS%29.svg', text: '新しいメールがあります' },
-  { icon: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/OOjs_UI_icon_alert-destructive.svg', text: '期限切れのタスクがあります' }
+  { icon: 'message', text: '未読14件', detail: 'LINEの未読メッセージが14件あります。' },
+  { icon: 'mail', text: '新しいメールがあります', detail: '受信トレイに3件の新着メールがあります。' },
+  { icon: 'alert', text: '期限切れのタスクがあります', detail: '期限切れのタスクが2件あります。早急に対応してください。' }
 ];
 
-// 通知を順番に表示
 function showNotifications() {
   const container = document.getElementById('notifications');
   notificationsData.forEach((n, index) => {
@@ -29,23 +39,27 @@ function showNotifications() {
       const div = document.createElement('div');
       div.className = 'notification';
 
-      const img = document.createElement('img');
-      img.src = n.icon;
-      img.alt = '通知アイコン';
+      // アイコン挿入
+      div.innerHTML = `
+        <div class="notification-header">
+          ${icons[n.icon]}
+          <div class="notification-text">${n.text}</div>
+        </div>
+        <div class="notification-detail">${n.detail}</div>
+      `;
 
-      const textDiv = document.createElement('div');
-      textDiv.className = 'notification-text';
-      textDiv.textContent = n.text;
-
-      div.appendChild(img);
-      div.appendChild(textDiv);
       container.appendChild(div);
 
-      // アニメーション開始
+      // スライドインアニメーション開始
       requestAnimationFrame(() => {
         div.style.animation = 'slideIn 0.5s forwards';
       });
-    }, index * 1000); // 1秒ごとに次の通知
+
+      // クリックで詳細開閉
+      div.addEventListener('click', () => {
+        div.classList.toggle('open');
+      });
+    }, index * 1000);
   });
 }
 
